@@ -2,14 +2,18 @@
 
 FROM bellsoft/liberica-openjdk-debian:11
 
-ADD dist /opt/dist
-ADD scripts /opt/scripts
-
 # Install collaboration server
+
+ADD dist /opt/dist
 
 RUN cd /opt/dist && tar -xf ./*.gz && \
     chmod +x ./1ce-installer-cli && \
     ./1ce-installer-cli install
+
+RUN apt-get update && \
+    apt-get install gawk -y
+
+ADD scripts /opt/scripts
 
 RUN cd /opt/scripts && \
     cp ./ring.sh /bin/ring && \
@@ -29,14 +33,6 @@ RUN ring hazelcast instance create --dir /var/opt/cs/hazelcast && \
 RUN ring hazelcast --instance hazelcast service create --init-system sysv --stopped --java-home $JAVA_HOME && \
     ring elasticsearch --instance elasticsearch service create --init-system sysv --stopped --java-home $JAVA_HOME && \
     ring cs --instance cs service create --init-system sysv --stopped --java-home $JAVA_HOME
-
-ARG PG_BD
-ARG PG_USER
-ARG PG_PWD
-
-ARG POSTGRES_URL="postgres:5432/${PG_BD}"
-ARG POSTGRES_USER=${PG_USER}
-ENV POSTGRES_PASSWORD=${PG_PWD}
 
 EXPOSE 9094
 

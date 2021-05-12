@@ -8,6 +8,10 @@ services:
             - "${SERVER_PORT}:9094"
         depends_on:
             - "postgres"
+        environment:
+            POSTGRES_USER: ${PG_USER}
+            POSTGRES_PASSWORD: ${PG_PWD}
+            POSTGRES_DB: ${PG_BD}
     postgres:
         build:
             context: ./pg
