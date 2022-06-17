@@ -26,12 +26,16 @@ RUN apt-get clean && \
 
 # Install and create services
 
+RUN useradd es_user && \
+    mkdir -p /var/opt/cs/elasticsearch && \
+    chown es_user:es_user /var/opt/cs/elasticsearch
+
 RUN ring hazelcast instance create --dir /var/opt/cs/hazelcast && \
-    ring elasticsearch instance create --dir /var/opt/cs/elasticsearch && \
+    ring elasticsearch instance create --dir /var/opt/cs/elasticsearch --owner es_user && \
     ring cs instance create --dir /var/opt/cs/cs
 
 RUN ring hazelcast --instance hazelcast service create --init-system sysv --stopped --java-home $JAVA_HOME && \
-    ring elasticsearch --instance elasticsearch service create --init-system sysv --stopped --java-home $JAVA_HOME && \
+    ring elasticsearch --instance elasticsearch service create --username es_user --init-system sysv --stopped --java-home $JAVA_HOME && \
     ring cs --instance cs service create --init-system sysv --stopped --java-home $JAVA_HOME
 
 EXPOSE 9094
