@@ -8,7 +8,7 @@ ADD dist /opt/dist
 
 RUN cd /opt/dist && tar -xf ./*.gz && \
     chmod +x ./1ce-installer-cli && \
-    ./1ce-installer-cli install
+    ./1ce-installer-cli install --ignore-signature-warnings 
 
 RUN apt-get update && \
     apt-get install gawk -y
